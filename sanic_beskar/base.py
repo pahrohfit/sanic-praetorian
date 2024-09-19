@@ -1798,17 +1798,14 @@ class Beskar:
             jinja_tmpl = jinja2.Template(template, autoescape=True, enable_async=True)
             notification["message"] = (await jinja_tmpl.render_async(notification)).strip()
 
-            _mail = import_module(self.app.ctx.mail.__module__)
-            msg = _mail.Message(
+            logger.debug(f"Sending email to {email}")
+            notification["result"] = await self.app.ctx.mail.send_message(
                 subject=notification["subject"],
                 to=[notification["email"]],
                 from_address=action_sender,
                 html=notification["message"],
-                reply_to=[action_sender],
+                reply_to=action_sender
             )
-
-            logger.debug(f"Sending email to {email}")
-            notification["result"] = await self.app.ctx.mail.send_message(msg)
 
         return notification
 

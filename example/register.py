@@ -4,6 +4,7 @@ import string
 import sanic_beskar
 from async_sender import Mail  # type: ignore
 from sanic import Sanic, json
+from sanic.response.types import JSONResponse
 from sanic_beskar import Beskar
 from tortoise import fields
 from tortoise.contrib.sanic import register_tortoise
@@ -243,9 +244,9 @@ def create_app() -> Sanic:
             roles="operator",
         )
 
-        await _guard.send_registration_email(email, user=new_user)
+        await _guard.send_registration_email(email, user=new_user, confirmation_sender="you@whatever.com")
         ret = {"message": f"successfully sent registration email to user {new_user.username}"}
-        return (json(ret), 201)
+        return JSONResponse(ret, 201)
 
     @sanic_app.route("/finalize")
     async def finalize(*args):
